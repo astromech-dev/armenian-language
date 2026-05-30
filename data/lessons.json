@@ -1,0 +1,30 @@
+{
+  "blocks": [
+    { "id": "basics", "title": "Основа", "lessons": [1, 2, 3, 4] },
+    { "id": "about", "title": "О себе", "lessons": [5, 6, 7, 8] },
+    { "id": "situations", "title": "Ситуации", "lessons": [9, 10, 11, 12, 13, 14] },
+    { "id": "extra", "title": "Расширение", "lessons": [15, 16, 17, 18] },
+    { "id": "citizenship", "title": "Для теста (гражданство)", "lessons": [19] }
+  ],
+  "lessons": [
+    { "id": 1, "title": "Приветствия и вежливость", "file": "lesson-1.json" },
+    { "id": 2, "title": "Числа 1–10", "file": "lesson-2.json" },
+    { "id": 3, "title": "Десятки, сотня, тысяча", "file": "lesson-3.json" },
+    { "id": 4, "title": "Простые вопросы и ответы", "file": "lesson-4.json" },
+    { "id": 5, "title": "Знакомство", "file": "lesson-5.json" },
+    { "id": 6, "title": "Семья", "file": "lesson-6.json" },
+    { "id": 7, "title": "Профессии и работа", "file": "lesson-7.json" },
+    { "id": 8, "title": "Языки и страны", "file": "lesson-8.json" },
+    { "id": 9, "title": "В магазине", "file": "lesson-9.json" },
+    { "id": 10, "title": "Еда и продукты", "file": "lesson-10.json" },
+    { "id": 11, "title": "В кафе", "file": "lesson-11.json" },
+    { "id": 12, "title": "Транспорт", "file": "lesson-12.json" },
+    { "id": 13, "title": "Время и дни", "file": "lesson-13.json" },
+    { "id": 14, "title": "У врача / аптека", "file": "lesson-14.json" },
+    { "id": 15, "title": "Дом и быт", "file": "lesson-15.json" },
+    { "id": 16, "title": "Город и места", "file": "lesson-16.json" },
+    { "id": 17, "title": "Погода", "file": "lesson-17.json" },
+    { "id": 18, "title": "Чувства и состояния", "file": "lesson-18.json" },
+    { "id": 19, "title": "Гражданство и государство", "file": "lesson-19.json" }
+  ]
+}

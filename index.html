@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Армянский — учим вместе</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ============ ГЛАВНАЯ ============ -->
+    <section id="screen-home" class="screen">
+      <header class="app-header">
+        <h1 class="app-title">Հայերեն</h1>
+        <div class="streak" id="home-streak"></div>
+      </header>
+
+      <div class="home-progress">
+        <div class="progress-bar"><div class="progress-fill" id="home-progress-fill"></div></div>
+        <div class="progress-label" id="home-progress-label"></div>
+      </div>
+
+      <div class="home-actions">
+        <button class="btn btn-primary btn-big" id="btn-continue"></button>
+        <div class="home-row">
+          <button class="btn btn-secondary" id="btn-review"></button>
+          <button class="btn btn-secondary" id="btn-letters">Буквы</button>
+        </div>
+      </div>
+
+      <div id="home-lessons" class="lesson-list"></div>
+    </section>
+
+    <!-- ============ УРОК ============ -->
+    <section id="screen-lesson" class="screen">
+      <header class="lesson-header">
+        <button class="btn-icon" id="lesson-exit" aria-label="Выйти">✕</button>
+        <div class="progress-bar slim"><div class="progress-fill" id="lesson-progress-fill"></div></div>
+      </header>
+      <div id="lesson-body" class="exercise-body"></div>
+    </section>
+
+    <!-- ============ РЕЗУЛЬТАТ ============ -->
+    <section id="screen-result" class="screen">
+      <div class="result-card">
+        <div class="result-emoji">🎉</div>
+        <h2 id="result-title">Урок пройден!</h2>
+        <p id="result-score" class="result-score"></p>
+        <p id="result-note" class="result-note"></p>
+        <button class="btn btn-primary btn-big" id="result-back">К списку уроков</button>
+      </div>
+    </section>
+
+    <!-- ============ ПОВТОРЕНИЕ (SRS) ============ -->
+    <section id="screen-review" class="screen">
+      <header class="lesson-header">
+        <button class="btn-icon" id="review-exit" aria-label="Выйти">✕</button>
+        <div class="progress-bar slim"><div class="progress-fill" id="review-progress-fill"></div></div>
+      </header>
+      <div id="review-body" class="exercise-body"></div>
+    </section>
+
+    <!-- ============ БУКВЫ ============ -->
+    <section id="screen-letters" class="screen">
+      <header class="lesson-header">
+        <button class="btn-icon" id="letters-exit" aria-label="Выйти">✕</button>
+        <h2 class="screen-subtitle">Буквы</h2>
+      </header>
+      <div id="letters-body" class="exercise-body"></div>
+    </section>
+
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/exercises.js"></script>
+  <script src="js/srs.js"></script>
+  <script src="js/letters.js"></script>
+  <script src="js/lesson.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
