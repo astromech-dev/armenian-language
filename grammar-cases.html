@@ -1,0 +1,237 @@
+<!-- 
+  ПАДЕЖИ АРМЯНСКОГО — справочная страница (раздел «Грамматика»).
+  ЧЕРНОВИК: армянские формы и окончания нужно сверить с учебником/носителем!
+  Самостоятельная страница. Цвета вынесены в CSS-переменные — подстрой под сайт.
+-->
+<style>
+  .gram-wrap {
+    --ink: #2a2540;
+    --muted: #6b6485;
+    --accent: #5b5bd6;
+    --accent-soft: #ecebff;
+    --warn-bg: #fff6e6;
+    --warn-bd: #f0c869;
+    --line: #e7e4f0;
+    --card: #ffffff;
+    --bg: #f6f5fb;
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    color: var(--ink);
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 8px 16px 64px;
+    line-height: 1.6;
+  }
+  .gram-wrap h1 {
+    font-size: 1.7rem;
+    letter-spacing: -0.02em;
+    margin: 8px 0 4px;
+  }
+  .gram-wrap .lead {
+    color: var(--muted);
+    margin: 0 0 24px;
+  }
+  .gram-wrap h2 {
+    font-size: 1.2rem;
+    margin: 32px 0 12px;
+    padding-left: 12px;
+    border-left: 4px solid var(--accent);
+  }
+  .gram-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin: 14px 0;
+    box-shadow: 0 1px 2px rgba(40,30,80,.04);
+  }
+  .case-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .case-num {
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: .8rem;
+    border-radius: 999px;
+    padding: 2px 10px;
+  }
+  .case-name { font-weight: 700; font-size: 1.05rem; }
+  .case-q { color: var(--muted); font-size: .9rem; }
+  .case-body { margin-top: 8px; }
+  .hy { font-size: 1.15rem; font-weight: 600; }
+  .gram-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: .96rem;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  .gram-table th, .gram-table td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .gram-table th {
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: .82rem;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+  }
+  .gram-table tr:last-child td { border-bottom: none; }
+  .gram-table td.hy-cell { font-weight: 600; font-size: 1.05rem; white-space: nowrap; }
+  .gram-table tr:nth-child(even) td { background: #faf9ff; }
+  .warn {
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-bd);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: .92rem;
+  }
+  .warn b { color: #9a6b00; }
+  .ex { color: var(--muted); font-size: .92rem; margin-top: 4px; }
+  .ex b { color: var(--ink); }
+  .pill {
+    display: inline-block;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 8px;
+    padding: 1px 8px;
+    font-weight: 600;
+    font-size: .85rem;
+  }
+</style>
+
+<div class="gram-wrap">
+
+  <h1>Падежи армянского языка</h1>
+  <p class="lead">В восточноармянском 7 падежей. Падеж выражается окончанием, которое добавляется к слову. Артиклей-предлогов, как в русском, почти нет — работу «предлогов» берут на себя падежи.</p>
+
+  <div class="warn">
+    <b>⚠️ Это черновик для проверки.</b> Формы и окончания нужно сверить с учебником или носителем перед публикацией — особенно слова-исключения.
+  </div>
+
+  <h2>Как это работает</h2>
+  <div class="gram-card">
+    Берём слово в начальной форме и меняем окончание в зависимости от роли в предложении. Пример на слове <span class="hy">տուն</span> (дом):
+    <div class="ex"><b>տուն</b> — дом стоит здесь · <b>տան</b> — дверь <i>дома</i> · <b>տանը</b> — я <i>в доме</i> · <b>տուն</b> — иду <i>домой</i></div>
+  </div>
+
+  <h2>Семь падежей по порядку</h2>
+
+  <div class="gram-card">
+    <div class="case-head">
+      <span class="case-num">1</span>
+      <span class="case-name">Именительный (ուղղական)</span>
+      <span class="case-q">кто? что?</span>
+    </div>
+    <div class="case-body">Начальная форма слова — подлежащее. Окончания нет.
+      <div class="ex">Примеры: <span class="hy">տուն</span> — дом · <span class="hy">գիրք</span> — книга</div>
+    </div>
+  </div>
+
+  <div class="gram-card">
+    <div class="case-head">
+      <span class="case-num">2</span>
+      <span class="case-name">Родительный (սեռական)</span>
+      <span class="case-q">кого? чего? чей?</span>
+    </div>
+    <div class="case-body">Принадлежность. Чаще всего окончание <span class="pill">-ի</span>.
+      <div class="ex"><span class="hy">տան</span> — дома (дверь дома) · <span class="hy">գրքի</span> — книги (обложка книги)</div>
+    </div>
+  </div>
+
+  <div class="gram-card">
+    <div class="case-head">
+      <span class="case-num">3</span>
+      <span class="case-name">Дательный (տրական)</span>
+      <span class="case-q">кому? чему?</span>
+    </div>
+    <div class="case-body">Адресат действия. Часто совпадает с родительным + артикль <span class="pill">-ն</span>.
+      <div class="ex"><span class="hy">տանը</span> — дому · <span class="hy">գրքին</span> — книге</div>
+    </div>
+  </div>
+
+  <div class="gram-card">
+    <div class="case-head">
+      <span class="case-num">4</span>
+      <span class="case-name">Винительный (հայցական)</span>
+      <span class="case-q">кого? что? (объект)</span>
+    </div>
+    <div class="case-body">Прямой объект. У неодушевлённых совпадает с именительным; у одушевлённых — с дательным.
+      <div class="ex"><span class="hy">գիրք</span> (вижу книгу) · <span class="hy">տղային</span> (вижу мальчика)</div>
+    </div>
+  </div>
+
+  <div class="gram-card">
+    <div class="case-head">
+      <span class="case-num">5</span>
+      <span class="case-name">Творительный (գործիական)</span>
+      <span class="case-q">кем? чем?</span>
+    </div>
+    <div class="case-body">Орудие, средство. Окончание <span class="pill">-ով</span>.
+      <div class="ex"><span class="hy">գրչով</span> — ручкой · <span class="hy">մեքենայով</span> — на машине</div>
+    </div>
+  </div>
+
+  <div class="gram-card">
+    <div class="case-head">
+      <span class="case-num">6</span>
+      <span class="case-name">Отложительный (բացառական)</span>
+      <span class="case-q">от кого? откуда?</span>
+    </div>
+    <div class="case-body">Исходная точка, «от/из». Окончание <span class="pill">-ից</span>.
+      <div class="ex"><span class="hy">տնից</span> — из дома · <span class="hy">քաղաքից</span> — из города</div>
+    </div>
+  </div>
+
+  <div class="gram-card">
+    <div class="case-head">
+      <span class="case-num">7</span>
+      <span class="case-name">Местный (ներգոյական)</span>
+      <span class="case-q">где? в чём?</span>
+    </div>
+    <div class="case-body">Место. Окончание <span class="pill">-ում</span> (для неодушевлённых).
+      <div class="ex"><span class="hy">տանը / տանում</span> — в доме · <span class="hy">քաղաքում</span> — в городе</div>
+    </div>
+  </div>
+
+  <h2>Слова-исключения</h2>
+  <div class="warn">
+    <b>Особенно проверь этот блок.</b> Ряд частых слов склоняется не по общему правилу — их формы нужно запоминать отдельно.
+  </div>
+  <div class="gram-card">
+    <table class="gram-table">
+      <tr><th>Слово</th><th>Значение</th><th>Родительный</th><th>Особенность</th></tr>
+      <tr><td class="hy-cell">տուն</td><td>дом</td><td class="hy-cell">տան</td><td>меняется основа (не տունի)</td></tr>
+      <tr><td class="hy-cell">մարդ</td><td>человек</td><td class="hy-cell">մարդու</td><td>окончание -ու</td></tr>
+      <tr><td class="hy-cell">օր</td><td>день</td><td class="hy-cell">օրվա</td><td>особая форма</td></tr>
+      <tr><td class="hy-cell">գիշեր</td><td>ночь</td><td class="hy-cell">գիշերվա</td><td>особая форма</td></tr>
+      <tr><td class="hy-cell">քույր</td><td>сестра</td><td class="hy-cell">քրոջ</td><td>сильно меняется</td></tr>
+      <tr><td class="hy-cell">մայր</td><td>мать</td><td class="hy-cell">մոր</td><td>сильно меняется</td></tr>
+      <tr><td class="hy-cell">հայր</td><td>отец</td><td class="hy-cell">հոր</td><td>сильно меняется</td></tr>
+    </table>
+  </div>
+
+  <h2>Итоговая таблица</h2>
+  <p class="ex" style="margin-bottom:8px">Окончания на примере слова <span class="hy">քաղաք</span> (город).</p>
+  <div class="gram-card">
+    <table class="gram-table">
+      <tr><th>Падеж</th><th>Вопрос</th><th>Окончание</th><th>Пример</th></tr>
+      <tr><td>Именительный</td><td>кто/что</td><td>—</td><td class="hy-cell">քաղաք</td></tr>
+      <tr><td>Родительный</td><td>чей</td><td>-ի</td><td class="hy-cell">քաղաքի</td></tr>
+      <tr><td>Дательный</td><td>кому</td><td>-ին</td><td class="hy-cell">քաղաքին</td></tr>
+      <tr><td>Винительный</td><td>кого/что</td><td>= им./дат.</td><td class="hy-cell">քաղաք</td></tr>
+      <tr><td>Творительный</td><td>чем</td><td>-ով</td><td class="hy-cell">քաղաքով</td></tr>
+      <tr><td>Отложительный</td><td>откуда</td><td>-ից</td><td class="hy-cell">քաղաքից</td></tr>
+      <tr><td>Местный</td><td>где</td><td>-ում</td><td class="hy-cell">քաղաքում</td></tr>
+    </table>
+  </div>
+
+</div>

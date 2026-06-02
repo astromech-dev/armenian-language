@@ -38,24 +38,27 @@ armenian-app/
 ├── js/
 │   ├── app.js              # навигация, загрузка данных, главный экран
 │   ├── storage.js          # ВЕСЬ localStorage (load/save, SRS-данные, streak)
+│   ├── speech.js           # озвучка слов через браузерный синтезатор речи (TTS)
 │   ├── lesson.js           # прохождение урока: строит шаги, считает результат
 │   ├── exercises.js        # генерация и проверка типов упражнений
 │   ├── srs.js              # интервальное повторение + экран повторения
+│   ├── blocktest.js        # итоговый тест по разделу (3 жизни, финальное испытание)
 │   └── letters.js          # тренажёр алфавита
 └── data/
     ├── lessons.json        # список блоков и уроков (id, title, file)
     ├── alphabet.json       # буквы: char, lower, sound, name
-    └── lessons/lesson-1..19.json
+    └── lessons/lesson-1..20.json
 ```
 
 Порядок подключения скриптов в `index.html` важен (зависимости):
-`storage → exercises → srs → letters → lesson → app`.
+`storage → speech → exercises → srs → letters → lesson → blocktest → app`.
 
 ## Экраны (внутри index.html)
 
-`screen-home`, `screen-lesson`, `screen-result`, `screen-review`, `screen-letters`.
-Виден один за раз — `app.js` ставит класс `active`. Точка входа — IIFE в `app.js`,
-который грузит `lessons.json` + `alphabet.json` через `fetch`, потом рисует главную.
+`screen-home`, `screen-lesson`, `screen-result`, `screen-blocktest`, `screen-review`,
+`screen-letters`. Виден один за раз — `app.js` ставит класс `active`. Точка входа —
+IIFE в `app.js`, который грузит `lessons.json` + `alphabet.json` через `fetch`, потом
+рисует главную.
 
 ## Формат данных
 
@@ -71,6 +74,12 @@ armenian-app/
 - `intro` — пролистать все слова с переводом.
 - `choice` — выбрать перевод из 4 (направление hy→ru / ru→hy случайно). Кнопка
   «Далее» **закреплена снизу (sticky)**, неактивна до выбора ответа.
+- `listen` — звучит армянское слово (TTS через `Speech.speak`), нужно выбрать
+  русский перевод из 4. Озвучка проигрывается сама при показе шага, есть круглая
+  кнопка 🔊 для повтора. Кнопка «Показать слово» раскрывает написание — для тех, кто
+  не слышит или у кого нет армянского голоса. Если синтез речи не поддерживается —
+  слово показывается сразу, кнопка 🔊 неактивна. После ответа написание показывается
+  всегда. Только для слов (не для phrases).
 - `match` — соединить 4–5 пар; «Далее» активируется после всех пар.
 - `assemble` — собрать фразу из перемешанных слов (только для phrases из 2+ слов).
 - `input-hint` / `input` — ввод армянского (с подсказкой и без). **РЕАЛИЗОВАНЫ в коде,
@@ -78,7 +87,8 @@ armenian-app/
   (см. `Lesson.buildSteps` в `lesson.js`). Не возвращай без явной просьбы.
 
 Порядок шагов в уроке (`lesson.js` → `buildSteps`): intro → choice (все) →
-match (группами по 5) → assemble (фразы). Подсказки снимаются постепенно.
+listen (все слова) → match (группами по 5) → assemble (фразы). Подсказки снимаются
+постепенно.
 
 ## Логика повторения (srs.js / storage.js)
 
@@ -88,7 +98,26 @@ match (группами по 5) → assemble (фразы). Подсказки с
 При завершении урока его слова засеваются в SRS с level 0 (`markLessonComplete`).
 
 Объект в localStorage (ключ `armenian_progress`):
-`{ completedLessons, wordProgress:{hy:{level,nextReview,ru}}, lastLesson, streak, lastActiveDate }`.
+`{ completedLessons, wordProgress:{hy:{level,nextReview,ru}}, lessonProgress, passedBlockTests, lastLesson, streak, lastActiveDate }`.
+
+## Итоговый тест по разделу (blocktest.js)
+
+Отдельный режим (НЕ урок) — «финальное испытание» блока. Экран `screen-blocktest`,
+движок `BlockTest`. Карточка «Тест по разделу» появляется в конце каждого блока на
+главной.
+
+- **Доступ:** открыт, только когда ВСЕ уроки блока есть в `completedLessons`. Иначе
+  карточка показывается заблокированной (🔒) с подсказкой «Пройдите все уроки раздела».
+- **Содержание:** слова и фразы ВСЕХ уроков блока, перемешаны; выборка ~15–20 вопросов
+  (меньше — если материала мало). Типы только `choice` и `match` (тот же `exercises.js`).
+  Ввод армянских букв и таймер НЕ используются.
+- **3 жизни:** в шапке `♥♥♥`, каждый проваленный шаг убирает сердце. На 3-й ошибке тест
+  прерывается — экран «Тест не сдан» с кнопкой «Начать заново». Дошёл до конца с живыми
+  сердцами — экран «Тест сдан» с результатом.
+- **Хранение:** факт сдачи — в `passedBlockTests` (`Storage.markBlockTestPassed` /
+  `isBlockTestPassed`); у блока появляется отметка «Тест пройден». Перепроходить можно
+  всегда, отметка не снимается. Слова с ошибками отправляются в SRS-повторение
+  (`Storage.addWordsToReview` — level 0, nextReview = сегодня).
 
 ## Как запустить локально
 

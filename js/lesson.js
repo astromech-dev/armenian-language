@@ -24,6 +24,14 @@ const Lesson = (function () {
       steps.push({ type: 'choice', item: item, pool: all });
     });
 
+    // 2.5 listen — на слух: звучит армянское слово, выбор перевода (только слова)
+    // ВРЕМЕННО ОТКЛЮЧЕНО: в системе нет армянского голоса для синтеза речи.
+    // Код упражнения (Exercises.listen) и speech.js сохранены — вернуть озвучку
+    // можно, раскомментировав этот блок (например, после добавления mp3-файлов).
+    // Exercises.shuffle(words).forEach(function (item) {
+    //   steps.push({ type: 'listen', item: item, pool: all });
+    // });
+
     // 3. match — сопоставление, группами по 4–5
     chunk(Exercises.shuffle(all), 5).forEach(function (group) {
       if (group.length >= 2) {
@@ -42,12 +50,25 @@ const Lesson = (function () {
     return steps;
   }
 
-  function start(lesson, callbacks) {
+  function start(lesson, callbacks, resume) {
     const steps = buildSteps(lesson);
+
+    // Безопасно выбираем стартовый шаг. Сохранённую позицию используем только
+    // если урок не изменился: совпадает общее число шагов и индекс в границах.
+    // Если урок стал длиннее/короче — начинаем заново, чтобы не упасть.
+    let startIndex = 0;
+    if (resume && typeof resume.index === 'number') {
+      if (resume.total === steps.length && resume.index > 0 && resume.index < steps.length) {
+        startIndex = resume.index;
+      } else {
+        Storage.clearLessonPosition(lesson.id); // позиция устарела
+      }
+    }
+
     state = {
       lesson: lesson,
       steps: steps,
-      index: 0,
+      index: startIndex,
       correct: 0,
       scored: 0,
       callbacks: callbacks
@@ -75,6 +96,9 @@ const Lesson = (function () {
         if (correct) state.correct++;
       }
       state.index++;
+      // Сохраняем позицию после каждого завершённого шага — переживёт даже
+      // резкое закрытие вкладки, не только выход по крестику.
+      Storage.saveLessonPosition(state.lesson.id, state.index, state.steps.length);
       window.scrollTo(0, 0);
       renderStep();
     });
@@ -84,6 +108,9 @@ const Lesson = (function () {
     document.getElementById('lesson-progress-fill').style.width = '100%';
     const items = (state.lesson.words || []).concat(state.lesson.phrases || []);
     Storage.markLessonComplete(state.lesson.id, items);
+    // Урок пройден: промежуточная позиция больше не нужна.
+    // Отметку о завершении (completedLessons) markLessonComplete сохраняет.
+    Storage.clearLessonPosition(state.lesson.id);
     Storage.touchStreak();
     state.callbacks.onComplete({
       lessonId: state.lesson.id,

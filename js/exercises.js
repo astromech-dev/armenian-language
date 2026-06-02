@@ -130,6 +130,94 @@ const Exercises = (function () {
     }
   }
 
+  // ---------- listen: послушать слово и выбрать перевод ----------
+  function listen(step, container, onDone) {
+    clear(container);
+    const item = step.item;
+    const pool = step.pool;
+
+    // варианты — всегда русский перевод (звучит армянское слово)
+    const opts = shuffle([item].concat(distractors(pool, item, 'ru', 3)));
+
+    container.appendChild(el('div', { class: 'ex-prompt', text: 'Послушай и выбери перевод' }));
+
+    // кнопка воспроизведения
+    const playBtn = el('button', {
+      class: 'listen-play',
+      'aria-label': 'Прослушать',
+      html: '<span class="listen-icon">🔊</span>'
+    });
+    playBtn.addEventListener('click', function () {
+      playBtn.classList.remove('playing');
+      // перезапуск анимации
+      void playBtn.offsetWidth;
+      playBtn.classList.add('playing');
+      Speech.speak(item.hy);
+    });
+
+    const playWrap = el('div', { class: 'listen-play-wrap' }, [playBtn]);
+    container.appendChild(playWrap);
+
+    // показ написания слова (для тех, кто не слышит или нет звука)
+    const reveal = el('div', { class: 'listen-reveal hy hy-big' });
+    const revealBtn = el('button', { class: 'btn btn-ghost listen-show', text: 'Показать слово' });
+    revealBtn.addEventListener('click', function () {
+      reveal.textContent = item.hy;
+      reveal.classList.add('shown');
+      revealBtn.style.display = 'none';
+    });
+    container.appendChild(revealBtn);
+    container.appendChild(reveal);
+
+    // если синтез речи недоступен — сразу показываем слово
+    if (!Speech.supported()) {
+      reveal.textContent = item.hy;
+      reveal.classList.add('shown');
+      revealBtn.style.display = 'none';
+      playBtn.disabled = true;
+    }
+
+    const optWrap = el('div', { class: 'ex-options' });
+    const buttons = [];
+    opts.forEach(function (o) {
+      const b = el('button', { class: 'option', text: o.ru });
+      b.addEventListener('click', function () { answer(o, b); });
+      buttons.push(b);
+      optWrap.appendChild(b);
+    });
+    container.appendChild(optWrap);
+
+    let answered = false;
+    let isCorrect = false;
+    const nextBtn = footer(container, 'Далее', function () {
+      if (answered) onDone(isCorrect);
+    }, true);
+
+    // попытаться озвучить сразу при показе шага
+    if (Speech.supported()) {
+      playBtn.classList.add('playing');
+      Speech.speak(item.hy);
+    }
+
+    function answer(chosen, btn) {
+      if (answered) return;
+      answered = true;
+      isCorrect = chosen.hy === item.hy;
+      buttons.forEach(function (b) { b.disabled = true; });
+      btn.classList.add(isCorrect ? 'correct' : 'wrong');
+      if (!isCorrect) {
+        buttons.forEach(function (b, i) {
+          if (opts[i].hy === item.hy) b.classList.add('correct');
+        });
+      }
+      // после ответа всегда показываем написание
+      reveal.textContent = item.hy;
+      reveal.classList.add('shown');
+      revealBtn.style.display = 'none';
+      nextBtn.disabled = false;
+    }
+  }
+
   // ---------- match: соединить пары ----------
   function match(step, container, onDone) {
     clear(container);
@@ -328,6 +416,7 @@ const Exercises = (function () {
     switch (step.type) {
       case 'intro': return intro(step, container, onDone);
       case 'choice': return choice(step, container, onDone);
+      case 'listen': return listen(step, container, onDone);
       case 'match': return match(step, container, onDone);
       case 'input-hint': return inputHint(step, container, onDone);
       case 'input': return inputFree(step, container, onDone);

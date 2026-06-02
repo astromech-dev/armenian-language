@@ -7,6 +7,8 @@ const Storage = (function () {
     return {
       completedLessons: [],   // [1, 2, ...]
       wordProgress: {},       // { "Բարև": { level, nextReview } }
+      lessonProgress: {},     // { lessonId: { index, total } } — позиция внутри незавершённого урока
+      passedBlockTests: [],   // [blockId, ...] — сданные итоговые тесты разделов
       lastLesson: null,       // id последнего открытого урока
       streak: 0,
       lastActiveDate: null    // "YYYY-MM-DD"
@@ -116,10 +118,63 @@ const Storage = (function () {
     return due;
   }
 
+  // --- итоговый тест по разделу ---
+  // Отметить тест блока сданным. Повторное прохождение отметку не убирает.
+  function markBlockTestPassed(blockId) {
+    const p = loadProgress();
+    if (p.passedBlockTests.indexOf(blockId) === -1) {
+      p.passedBlockTests.push(blockId);
+      saveProgress(p);
+    }
+    return p;
+  }
+  function isBlockTestPassed(blockId) {
+    const p = loadProgress();
+    return p.passedBlockTests.indexOf(blockId) !== -1;
+  }
+
+  // Поставить слова в очередь повторения «на сегодня» (level 0, nextReview = сегодня).
+  // Используется, чтобы вернуть в SRS слова, на которых ошиблись в тесте.
+  function addWordsToReview(items) {
+    const p = loadProgress();
+    const today = todayStr();
+    (items || []).forEach(function (it) {
+      if (!it || !it.hy) return;
+      const w = p.wordProgress[it.hy] || {};
+      w.level = 0;
+      w.nextReview = today;
+      if (it.ru) w.ru = it.ru;
+      p.wordProgress[it.hy] = w;
+    });
+    saveProgress(p);
+    return p;
+  }
+
   function setLastLesson(lessonId) {
     const p = loadProgress();
     p.lastLesson = lessonId;
     saveProgress(p);
+  }
+
+  // --- позиция внутри незавершённого урока ---
+  // Сохраняем после каждого шага: на каком шаге пользователь и сколько всего шагов.
+  function saveLessonPosition(lessonId, index, total) {
+    const p = loadProgress();
+    p.lessonProgress[lessonId] = { index: index, total: total };
+    saveProgress(p);
+  }
+  // Вернёт { index, total } или null, если сохранённой позиции нет.
+  function getLessonPosition(lessonId) {
+    const p = loadProgress();
+    return p.lessonProgress[lessonId] || null;
+  }
+  // Убрать сохранённую позицию (урок завершён или начат заново).
+  function clearLessonPosition(lessonId) {
+    const p = loadProgress();
+    if (p.lessonProgress[lessonId]) {
+      delete p.lessonProgress[lessonId];
+      saveProgress(p);
+    }
   }
 
   return {
@@ -129,7 +184,13 @@ const Storage = (function () {
     updateWord: updateWord,
     getDueWords: getDueWords,
     touchStreak: touchStreak,
+    markBlockTestPassed: markBlockTestPassed,
+    isBlockTestPassed: isBlockTestPassed,
+    addWordsToReview: addWordsToReview,
     setLastLesson: setLastLesson,
+    saveLessonPosition: saveLessonPosition,
+    getLessonPosition: getLessonPosition,
+    clearLessonPosition: clearLessonPosition,
     todayStr: todayStr,
     addDays: addDays
   };

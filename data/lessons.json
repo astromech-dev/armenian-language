@@ -3,7 +3,7 @@
     { "id": "basics", "title": "Основа", "lessons": [1, 2, 3, 4] },
     { "id": "about", "title": "О себе", "lessons": [5, 6, 7, 8] },
     { "id": "situations", "title": "Ситуации", "lessons": [9, 10, 11, 12, 13, 14] },
-    { "id": "extra", "title": "Расширение", "lessons": [15, 16, 17, 18] },
+    { "id": "extra", "title": "Расширение", "lessons": [15, 16, 17, 18, 20] },
     { "id": "citizenship", "title": "Для теста (гражданство)", "lessons": [19] }
   ],
   "lessons": [
@@ -25,6 +25,7 @@
     { "id": 16, "title": "Город и места", "file": "lesson-16.json" },
     { "id": 17, "title": "Погода", "file": "lesson-17.json" },
     { "id": 18, "title": "Чувства и состояния", "file": "lesson-18.json" },
-    { "id": 19, "title": "Гражданство и государство", "file": "lesson-19.json" }
+    { "id": 19, "title": "Гражданство и государство", "file": "lesson-19.json" },
+    { "id": 20, "title": "Животные", "file": "lesson-20.json" }
   ]
 }

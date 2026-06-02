@@ -59,7 +59,8 @@
     const contId = nextLessonId(p);
     const contMeta = lessonMeta(contId);
     const contBtn = document.getElementById('btn-continue');
-    const isFresh = p.completedLessons.indexOf(contId) === -1 && done === 0;
+    const hasPos = !!Storage.getLessonPosition(contId);
+    const isFresh = p.completedLessons.indexOf(contId) === -1 && done === 0 && !hasPos;
     contBtn.textContent = (isFresh ? 'Начать: ' : 'Продолжить: ') +
       'урок ' + contId + ' · ' + (contMeta ? contMeta.title : '');
     contBtn.onclick = function () { openLesson(contId); };
@@ -83,28 +84,108 @@
         const meta = lessonMeta(id);
         if (!meta) return;
         const isDone = p.completedLessons.indexOf(id) !== -1;
-        const card = Exercises.el('button', { class: 'lesson-card' + (isDone ? ' done' : '') }, [
+        // «В процессе» — есть сохранённая позиция и урок ещё не пройден.
+        // Завершённость в приоритете: пройденный урок остаётся с галочкой,
+        // даже если его проходят заново (перепрохождение не снимает отметку).
+        const pos = Storage.getLessonPosition(id);
+        const inProgress = !isDone && pos && pos.index > 0 && pos.total && pos.index < pos.total;
+        const pct = inProgress ? Math.round((pos.index / pos.total) * 100) : 0;
+
+        const ttl = Exercises.el('span', { class: 'ttl' }, [
+          Exercises.el('span', { class: 'ttl-main', text: meta.title })
+        ]);
+        if (inProgress) {
+          ttl.appendChild(Exercises.el('span', { class: 'sub', text: 'В процессе · ' + pct + '%' }));
+        }
+
+        const cls = 'lesson-card' + (isDone ? ' done' : (inProgress ? ' in-progress' : ''));
+        const card = Exercises.el('button', { class: cls }, [
           Exercises.el('span', { class: 'mark', text: isDone ? '✓' : String(id) }),
-          Exercises.el('span', { class: 'ttl' }, [
-            document.createTextNode(meta.title)
-          ])
+          ttl
         ]);
         card.addEventListener('click', function () { openLesson(id); });
         section.appendChild(card);
       });
+
+      // «Тест по разделу» — в конце блока. Открыт, только когда все уроки пройдены.
+      const blockIds = block.lessons.filter(function (id) { return lessonMeta(id); });
+      if (blockIds.length) {
+        const allDone = blockIds.every(function (id) { return p.completedLessons.indexOf(id) !== -1; });
+        const passed = Storage.isBlockTestPassed(block.id);
+
+        const ttl = Exercises.el('span', { class: 'ttl' }, [
+          Exercises.el('span', { class: 'ttl-main', text: 'Тест по разделу' })
+        ]);
+        if (!allDone) {
+          ttl.appendChild(Exercises.el('span', { class: 'sub',
+            text: 'Пройдите все уроки раздела, чтобы открыть тест' }));
+        } else if (passed) {
+          ttl.appendChild(Exercises.el('span', { class: 'sub', text: 'Тест пройден' }));
+        }
+
+        const cls = 'lesson-card test' + (!allDone ? ' locked' : (passed ? ' done' : ''));
+        const mark = !allDone ? '🔒' : (passed ? '✓' : '🎯');
+        const testCard = Exercises.el('button', { class: cls }, [
+          Exercises.el('span', { class: 'mark', text: mark }),
+          ttl
+        ]);
+        if (allDone) {
+          testCard.addEventListener('click', function () { openBlockTest(block); });
+        } else {
+          testCard.disabled = true;
+        }
+        section.appendChild(testCard);
+      }
+
       listEl.appendChild(section);
     });
   }
 
   // ---------- запуск экранов ----------
   function openLesson(id) {
+    const pos = Storage.getLessonPosition(id);
+    // Есть незавершённый прогресс внутри урока — спрашиваем: продолжить или заново.
+    // Для непройденных уроков без прогресса — сразу с начала, без вопроса.
+    if (pos && pos.index > 0 && pos.total && pos.index < pos.total) {
+      askResume(id, pos,
+        function () { startLesson(id, pos); },
+        function () { Storage.clearLessonPosition(id); startLesson(id, null); });
+    } else {
+      startLesson(id, null);
+    }
+  }
+
+  // resume = { index, total } сохранённой позиции, либо null для старта с начала.
+  function startLesson(id, resume) {
     getLesson(id).then(function (lesson) {
       showScreen('screen-lesson');
       Lesson.start(lesson, {
         onComplete: showResult,
         onExit: goHome
-      });
+      }, resume);
     }).catch(showError);
+  }
+
+  // Диалог «Продолжить / Начать заново» для начатого урока.
+  function askResume(id, pos, onContinue, onRestart) {
+    const meta = lessonMeta(id);
+    const pct = pos.total ? Math.round((pos.index / pos.total) * 100) : 0;
+
+    const overlay = Exercises.el('div', { class: 'modal-overlay' });
+    const card = Exercises.el('div', { class: 'modal-card' });
+    card.appendChild(Exercises.el('h2', { class: 'modal-title',
+      text: 'Урок ' + id + ' · ' + (meta ? meta.title : '') }));
+    card.appendChild(Exercises.el('p', { class: 'modal-text',
+      text: 'Вы остановились на ' + pct + '%. Продолжить с этого места или начать заново?' }));
+
+    const contBtn = Exercises.el('button', { class: 'btn btn-primary btn-big', text: 'Продолжить' });
+    const restartBtn = Exercises.el('button', { class: 'btn btn-secondary', text: 'Начать заново' });
+    contBtn.addEventListener('click', function () { overlay.remove(); onContinue(); });
+    restartBtn.addEventListener('click', function () { overlay.remove(); onRestart(); });
+    card.appendChild(contBtn);
+    card.appendChild(restartBtn);
+    overlay.appendChild(card);
+    document.getElementById('app').appendChild(overlay);
   }
 
   function showResult(result) {
@@ -122,6 +203,20 @@
   function openReview() {
     showScreen('screen-review');
     SRS.start({ onExit: goHome });
+  }
+
+  // Итоговый тест блока: собираем слова и фразы всех его уроков и запускаем тест.
+  function openBlockTest(block) {
+    const ids = block.lessons.filter(function (id) { return lessonMeta(id); });
+    Promise.all(ids.map(getLesson)).then(function (lessons) {
+      const pool = [];
+      lessons.forEach(function (ls) {
+        (ls.words || []).forEach(function (w) { pool.push(w); });
+        (ls.phrases || []).forEach(function (w) { pool.push(w); });
+      });
+      showScreen('screen-blocktest');
+      BlockTest.start(block, pool, { onExit: goHome });
+    }).catch(showError);
   }
 
   function openLetters() {
@@ -148,6 +243,7 @@
   // ---------- кнопки выхода ----------
   document.getElementById('lesson-exit').addEventListener('click', function () { Lesson.exit(); });
   document.getElementById('review-exit').addEventListener('click', function () { SRS.exit(); });
+  document.getElementById('blocktest-exit').addEventListener('click', function () { BlockTest.exit(); });
   document.getElementById('letters-exit').addEventListener('click', goHome);
 
   // ---------- старт ----------
